@@ -81,6 +81,12 @@ export async function apiClient<T>(
     } catch {
       data = null
     }
+  } else if (contentType && contentType.includes("text/html")) {
+    throw new ApiError(
+      response.status,
+      "Received HTML response from server instead of JSON. Ensure backend is running and the endpoint is properly configured.",
+      null
+    )
   } else {
     data = await response.text()
   }

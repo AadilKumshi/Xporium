@@ -13,6 +13,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      "^/\\d+/runs": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+      },
       "/login": "http://127.0.0.1:8000",
       "/create_user": "http://127.0.0.1:8000",
       "/users": "http://127.0.0.1:8000",

@@ -20,7 +20,9 @@ def create_experiment(
         user_id=current_user.id,
         name=experiment.name,
         description=experiment.description,
-        project_url=experiment.project_url,
+        project_url=str(experiment.project_url)
+            if experiment.project_url
+            else None,
         dataset_name=experiment.dataset_name,
         dataset_public_url=str(experiment.dataset_public_url)
             if experiment.dataset_public_url
@@ -77,6 +79,13 @@ def update_experiment(
         )
 
     update_data = experiment_update.model_dump(exclude_unset=True)
+
+    if "project_url" in update_data:
+        update_data["project_url"] = (
+            str(update_data["project_url"])
+            if update_data["project_url"] is not None
+            else None
+        )
 
     if "dataset_public_url" in update_data:
         update_data["dataset_public_url"] = (

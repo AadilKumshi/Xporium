@@ -63,6 +63,9 @@ export function ExperimentDetailPage() {
     enabled: !!experimentId,
   })
 
+  const configsList = Array.isArray(dataConfigs) ? dataConfigs : []
+  const runsList = Array.isArray(runs) ? runs : []
+
   const deleteMutation = useMutation({
     mutationFn: () => experimentsApi.delete(experimentId),
     onSuccess: () => {
@@ -253,7 +256,7 @@ export function ExperimentDetailPage() {
               <Skeleton className="h-32 w-full" />
               <Skeleton className="h-32 w-full" />
             </div>
-          ) : dataConfigs.length === 0 ? (
+          ) : configsList.length === 0 ? (
             <EmptyState
               icon={<Sliders className="w-9 h-9 text-muted-foreground" />}
               title="No dataset configurations"
@@ -263,7 +266,7 @@ export function ExperimentDetailPage() {
             />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {dataConfigs.map((cfg) => (
+              {configsList.map((cfg) => (
                 <DataConfigCard key={cfg.id} config={cfg} />
               ))}
             </div>
@@ -279,10 +282,10 @@ export function ExperimentDetailPage() {
             <Button
               onClick={() => setCreateRunOpen(true)}
               size="sm"
-              disabled={dataConfigs.length === 0}
+              disabled={configsList.length === 0}
               className="bg-foreground text-background hover:bg-foreground/90 font-medium text-xs"
               title={
-                dataConfigs.length === 0
+                configsList.length === 0
                   ? "Add a data configuration before recording a run"
                   : ""
               }
@@ -292,7 +295,7 @@ export function ExperimentDetailPage() {
             </Button>
           </div>
 
-          {dataConfigs.length === 0 && (
+          {configsList.length === 0 && (
             <div className="rounded border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
               💡 Please create at least one <strong>Data Configuration</strong>{" "}
               before recording a training run.
@@ -304,17 +307,17 @@ export function ExperimentDetailPage() {
               <Skeleton className="h-24 w-full" />
               <Skeleton className="h-24 w-full" />
             </div>
-          ) : runs.length === 0 ? (
+          ) : runsList.length === 0 ? (
             <EmptyState
               icon={<PlayCircle className="w-9 h-9 text-muted-foreground" />}
               title="No training runs recorded yet"
               description="Log training duration, hyperparameters, and test metrics for this experiment."
-              actionLabel={dataConfigs.length > 0 ? "Record Training Run" : undefined}
+              actionLabel={configsList.length > 0 ? "Record Training Run" : undefined}
               onAction={() => setCreateRunOpen(true)}
             />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4" id="runs-container">
-              {runs.map((run) => (
+              {runsList.map((run) => (
                 <RunCard
                   key={run.id}
                   run={run}
