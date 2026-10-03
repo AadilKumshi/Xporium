@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
 import { EditRunDialog } from "./edit-run-dialog"
-import { PlayCircle, Clock, Cpu, Edit3, Trash2, ArrowUpRight } from "lucide-react"
+import { Clock, Cpu, Edit3, Trash2, ArrowUpRight } from "lucide-react"
 
 interface RunCardProps {
   run: Run

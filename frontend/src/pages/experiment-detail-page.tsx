@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useParams, useNavigate, Link } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { experimentsApi } from "@/api/experiments"
 import { runsApi } from "@/api/runs"
