@@ -58,7 +58,9 @@ Ensure you have the following installed on your machine:
 3. **Install Python dependencies**:
    ```bash
    pip install -r requirements.txt
+   pip install "psycopg[binary]"
    ```
+   > *Note: `psycopg[binary]` (v3) is required by the SQLAlchemy `postgresql+psycopg://` connection URL.*
 
 4. **Environment Configuration**:
    Create a `.env` file in `backend/` (or set environment variables):
@@ -69,9 +71,11 @@ Ensure you have the following installed on your machine:
    > *Note: Ensure your PostgreSQL database `xporium` exists (`createdb xporium` or via psql).*
 
 5. **Start the FastAPI server**:
+   Always run from inside the `backend/` directory with the virtualenv active:
    ```bash
    uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
    ```
+   *(Or from the project root: `backend/venv/bin/uvicorn --app-dir backend app.main:app --reload --host 127.0.0.1 --port 8000`)*
    The backend API documentation will be available at:
    - Interactive Swagger Docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
    - Alternative ReDoc: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
