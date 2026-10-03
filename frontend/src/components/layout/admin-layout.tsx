@@ -1,5 +1,6 @@
 import { Outlet, NavLink } from "react-router-dom"
 import { BarChart3, Users, Boxes, PlayCircle, ArrowLeft } from "lucide-react"
+import { ThemeToggle } from "@/components/shared/theme-toggle"
 
 export function AdminLayout() {
   return (
@@ -77,9 +78,12 @@ export function AdminLayout() {
           </nav>
         </div>
 
-        <span className="text-[10px] font-mono uppercase bg-muted text-muted-foreground px-2 py-0.5 rounded border border-border">
-          Admin Portal
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-[10px] font-mono uppercase bg-muted text-muted-foreground px-2 py-0.5 rounded border border-border">
+            Admin Portal
+          </span>
+          <ThemeToggle />
+        </div>
       </div>
 
       <div className="flex-1 p-8 overflow-y-auto">

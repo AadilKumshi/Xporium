@@ -3,6 +3,7 @@ import { Outlet, NavLink, useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
+import { ThemeToggle } from "@/components/shared/theme-toggle"
 import { authApi } from "@/api/auth"
 import {
   Boxes,
@@ -42,12 +43,15 @@ export function AppLayout() {
       <aside className="w-64 border-r border-border flex flex-col justify-between p-4 bg-card">
         <div className="space-y-6">
           <div className="flex items-center justify-between px-2">
-            <span className="font-semibold text-lg tracking-wider font-mono">
-              XPORIUM
-            </span>
-            <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded border border-border text-muted-foreground">
-              v1.0
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-lg tracking-wider font-mono">
+                XPORIUM
+              </span>
+              <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded border border-border text-muted-foreground">
+                v1.0
+              </span>
+            </div>
+            <ThemeToggle />
           </div>
 
           <nav className="space-y-1">

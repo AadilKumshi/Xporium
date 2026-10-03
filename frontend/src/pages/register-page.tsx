@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
+import { ThemeToggle } from "@/components/shared/theme-toggle"
 
 export function RegisterPage() {
   const [username, setUsername] = useState("")
@@ -52,7 +53,10 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-background">
+    <div className="relative flex min-h-screen items-center justify-center p-4 bg-background">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center space-y-1">
           <h1 className="text-xl font-bold font-mono tracking-widest text-foreground">

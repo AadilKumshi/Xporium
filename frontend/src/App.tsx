@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { AuthProvider } from "@/hooks/use-auth"
+import { ThemeProvider } from "@/components/theme-provider"
 import { ProtectedRoute, AdminRoute } from "@/components/layout/protected-route"
 import { AppLayout } from "@/components/layout/app-layout"
 import { AdminLayout } from "@/components/layout/admin-layout"
@@ -27,8 +28,9 @@ const queryClient = new QueryClient({
 
 export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
+    <ThemeProvider defaultTheme="dark" storageKey="xporium_theme">
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
         <BrowserRouter>
           <Routes>
             {/* Public routes */}
@@ -70,6 +72,7 @@ export function App() {
         </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>
+    </ThemeProvider>
   )
 }
 
