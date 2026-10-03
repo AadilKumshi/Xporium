@@ -5,6 +5,8 @@ import { experimentsApi } from "@/api/experiments"
 import { runsApi } from "@/api/runs"
 import { DataConfigCard } from "@/features/data-configs/data-config-card"
 import { CreateDataConfigDialog } from "@/features/data-configs/create-data-config-dialog"
+import { RunCard } from "@/features/runs/run-card"
+import { CreateRunDialog } from "@/features/runs/create-run-dialog"
 import { EditExperimentDialog } from "@/features/experiments/edit-experiment-dialog"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
 import { EmptyState } from "@/components/shared/empty-state"
@@ -311,35 +313,24 @@ export function ExperimentDetailPage() {
               onAction={() => setCreateRunOpen(true)}
             />
           ) : (
-            <div className="space-y-3" id="runs-container">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" id="runs-container">
               {runs.map((run) => (
-                <div
+                <RunCard
                   key={run.id}
-                  className="p-4 rounded-xl border border-border bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-foreground/30 transition-colors"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-sm font-mono">
-                        Run #{run.id} — {run.model_name}
-                      </span>
-                      <Badge variant="outline" className="font-mono text-[10px] uppercase">
-                        {run.environment_type}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Duration: {run.training_duration}s • Parameters:{" "}
-                      {run.parameters?.length || 0} • Metrics:{" "}
-                      {run.metrics?.length || 0}
-                    </p>
-                  </div>
-
-                  <Link
-                    to={`/experiments/${experimentId}/runs/${run.id}`}
-                    className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium border border-border rounded-md hover:bg-muted transition-colors"
-                  >
-                    View Details
-                  </Link>
-                </div>
+                  run={run}
+                  experimentId={experimentId}
+                  onDelete={async (runId) => {
+                    await runsApi.delete(runId)
+                    queryClient.invalidateQueries({
+                      queryKey: ["runs", experimentId],
+                    })
+                  }}
+                  onUpdated={() => {
+                    queryClient.invalidateQueries({
+                      queryKey: ["runs", experimentId],
+                    })
+                  }}
+                />
               ))}
             </div>
           )}
@@ -365,6 +356,18 @@ export function ExperimentDetailPage() {
         onCreated={() => {
           queryClient.invalidateQueries({
             queryKey: ["data-configs", experimentId],
+          })
+        }}
+      />
+
+      <CreateRunDialog
+        open={createRunOpen}
+        onOpenChange={setCreateRunOpen}
+        experimentId={experimentId}
+        dataConfigs={dataConfigs}
+        onCreated={() => {
+          queryClient.invalidateQueries({
+            queryKey: ["runs", experimentId],
           })
         }}
       />
