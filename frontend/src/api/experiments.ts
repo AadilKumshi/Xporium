@@ -61,4 +61,16 @@ export const experimentsApi = {
       }
     )
   },
+
+  deleteDataConfig: async (
+    experimentId: number,
+    dataConfigId: number
+  ): Promise<null> => {
+    return apiClient<null>(
+      `/experiments/${experimentId}/data-configurations/${dataConfigId}`,
+      {
+        method: "DELETE",
+      }
+    )
+  },
 }

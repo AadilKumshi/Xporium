@@ -2,14 +2,23 @@ import { useState } from "react"
 import type { DataConfiguration } from "@/types"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { RatioBar } from "@/components/shared/ratio-bar"
-import { ChevronDown, ChevronUp, Layers, Shuffle, Sliders } from "lucide-react"
+import {
+  ChevronDown,
+  ChevronUp,
+  Layers,
+  Shuffle,
+  Sliders,
+  Trash2,
+} from "lucide-react"
 
 interface DataConfigCardProps {
   config: DataConfiguration
+  onDelete: (config: DataConfiguration) => void
 }
 
-export function DataConfigCard({ config }: DataConfigCardProps) {
+export function DataConfigCard({ config, onDelete }: DataConfigCardProps) {
   const [stepsOpen, setStepsOpen] = useState(false)
 
   const steps = config.preprocessing_steps || []
@@ -29,17 +38,29 @@ export function DataConfigCard({ config }: DataConfigCardProps) {
             )}
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
-            {config.shuffle && (
-              <span className="flex items-center gap-1 text-[11px]">
-                <Shuffle className="w-3 h-3" /> Shuffle
-              </span>
-            )}
-            {config.stratified && (
-              <span className="flex items-center gap-1 text-[11px] ml-2">
-                <Sliders className="w-3 h-3" /> Stratified
-              </span>
-            )}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
+              {config.shuffle && (
+                <span className="flex items-center gap-1 text-[11px]">
+                  <Shuffle className="w-3 h-3" />
+                  Shuffle{config.random_seed !== null && ` · Seed ${config.random_seed}`}
+                </span>
+              )}
+              {config.stratified && (
+                <span className="flex items-center gap-1 text-[11px] ml-2">
+                  <Sliders className="w-3 h-3" /> Stratified
+                </span>
+              )}
+            </div>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              onClick={() => onDelete(config)}
+              title="Delete data configuration"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </Button>
           </div>
         </div>
 

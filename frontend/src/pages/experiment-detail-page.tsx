@@ -1,6 +1,7 @@
 import { useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, useSearchParams } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import type { DataConfiguration } from "@/types"
 import { experimentsApi } from "@/api/experiments"
 import { runsApi } from "@/api/runs"
 import { DataConfigCard } from "@/features/data-configs/data-config-card"
@@ -31,10 +32,13 @@ export function ExperimentDetailPage() {
   const { id } = useParams<{ id: string }>()
   const experimentId = parseInt(id || "0", 10)
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const queryClient = useQueryClient()
 
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [dataConfigToDelete, setDataConfigToDelete] =
+    useState<DataConfiguration | null>(null)
   const [createDataConfigOpen, setCreateDataConfigOpen] = useState(false)
   const [createRunOpen, setCreateRunOpen] = useState(false)
 
@@ -74,6 +78,26 @@ export function ExperimentDetailPage() {
     },
   })
 
+  const deleteDataConfigMutation = useMutation({
+    mutationFn: () => {
+      if (!dataConfigToDelete) {
+        throw new Error("No data configuration selected")
+      }
+
+      return experimentsApi.deleteDataConfig(
+        experimentId,
+        dataConfigToDelete.id
+      )
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["data-configs", experimentId],
+      })
+      queryClient.invalidateQueries({ queryKey: ["runs", experimentId] })
+      setDataConfigToDelete(null)
+    },
+  })
+
   if (expLoading) {
     return (
       <div className="p-8 max-w-5xl w-full mx-auto space-y-6">
@@ -106,6 +130,7 @@ export function ExperimentDetailPage() {
     undefined,
     { month: "short", day: "numeric", year: "numeric" }
   )
+  const initialTab = searchParams.get("tab") === "runs" ? "runs" : "overview"
 
   return (
     <div className="p-8 max-w-5xl w-full mx-auto space-y-6">
@@ -175,31 +200,31 @@ export function ExperimentDetailPage() {
       </div>
 
       {/* Main Tabs */}
-      <Tabs defaultValue="overview" className="w-full">
+      <Tabs defaultValue={initialTab} className="w-full">
         <TabsList className="bg-muted p-1 border border-border">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="data">
-            Data Configurations ({dataConfigs.length})
+            Data Configurations 
           </TabsTrigger>
-          <TabsTrigger value="runs">Training Runs ({runs.length})</TabsTrigger>
+          <TabsTrigger value="runs">Training Runs </TabsTrigger>
         </TabsList>
 
         {/* Tab 1: Overview */}
         <TabsContent value="overview" className="pt-4 space-y-4">
-          <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+          <div className="rounded-xl border border-border bg-card p-3.75 space-y-4">
             <div>
               <h3 className="text-xs font-mono uppercase text-muted-foreground">
                 Description
               </h3>
               <p className="text-sm text-foreground mt-1 whitespace-pre-line">
-                {experiment.description || "No description provided."}
+                {experiment.description?.trim() || "No Description Provided"}
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-border">
               <div className="space-y-1">
                 <span className="text-xs font-mono uppercase text-muted-foreground">
-                  Dataset
+                  
                 </span>
                 <div className="flex items-center gap-2 text-sm text-foreground">
                   <Database className="w-4 h-4 text-muted-foreground" />
@@ -211,7 +236,7 @@ export function ExperimentDetailPage() {
                       rel="noreferrer"
                       className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1 underline underline-offset-2 ml-2"
                     >
-                      Public Dataset Link
+                      Dataset Link
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   )}
@@ -220,7 +245,7 @@ export function ExperimentDetailPage() {
 
               <div className="space-y-1">
                 <span className="text-xs font-mono uppercase text-muted-foreground">
-                  Timestamps
+                  
                 </span>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
@@ -267,7 +292,11 @@ export function ExperimentDetailPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {configsList.map((cfg) => (
-                <DataConfigCard key={cfg.id} config={cfg} />
+                <DataConfigCard
+                  key={cfg.id}
+                  config={cfg}
+                  onDelete={setDataConfigToDelete}
+                />
               ))}
             </div>
           )}
@@ -373,6 +402,23 @@ export function ExperimentDetailPage() {
             queryKey: ["runs", experimentId],
           })
         }}
+      />
+
+      <ConfirmDialog
+        open={dataConfigToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDataConfigToDelete(null)
+          }
+        }}
+        title="Delete Data Configuration?"
+        description={`Deleting "${dataConfigToDelete?.name || "this data configuration"}" will also permanently delete every training run that uses it, including its parameters, metrics, and artifacts.\n\nThis action cannot be undone.`}
+        confirmText={
+          deleteDataConfigMutation.isPending
+            ? "Deleting..."
+            : "Delete Configuration"
+        }
+        onConfirm={() => deleteDataConfigMutation.mutate()}
       />
 
       <ConfirmDialog

@@ -66,11 +66,9 @@ export function ExperimentCard({
           </CardHeader>
 
           <CardContent className="space-y-3 pt-2">
-            {experiment.description && (
-              <p className="text-xs text-muted-foreground line-clamp-2">
-                {experiment.description}
-              </p>
-            )}
+            <p className="text-xs text-muted-foreground line-clamp-2">
+              {experiment.description?.trim() || "No Description Provided"}
+            </p>
 
             <div className="space-y-1.5 text-xs text-muted-foreground pt-1">
               <div className="flex items-center gap-2">

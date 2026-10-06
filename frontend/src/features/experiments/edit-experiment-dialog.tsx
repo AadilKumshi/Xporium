@@ -165,6 +165,7 @@ export function EditExperimentDialog({
               id="edit-exp-desc"
               rows={2}
               value={formData.description}
+              className="h-40 min-h-40 max-h-40 resize-none overflow-x-hidden overflow-y-auto"
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, description: e.target.value }))
               }

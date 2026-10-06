@@ -42,7 +42,7 @@ export function ArtifactViewer({
             No Artifacts Attached
           </h4>
           <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-            Attach evaluation plots, confusion matrices, loss graphs, or experimental notes.
+            Attach Evaluation Plots, Confusion Matrices, Loss Graphs or Experimental Notes.
           </p>
         </div>
         <Button
@@ -78,7 +78,7 @@ export function ArtifactViewer({
         <div className="flex items-center justify-between pb-3 border-b border-border">
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono uppercase text-muted-foreground">
-              Attached Result & Artifact
+              Attached Artifact
             </span>
           </div>
 

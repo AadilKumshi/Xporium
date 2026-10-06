@@ -111,9 +111,9 @@ export function RunDetailPage() {
           <Button
             variant="ghost"
             size="icon-xs"
-            onClick={() => navigate(`/experiments/${experimentId}`)}
+            onClick={() => navigate(`/experiments/${experimentId}?tab=runs`)}
             className="text-muted-foreground hover:text-foreground"
-            title="Back to Experiment"
+            title="Back to Runs"
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
@@ -199,14 +199,14 @@ export function RunDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-2">
           <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-            Hyperparameters ({run.parameters?.length || 0})
+            Parameters
           </h3>
           <RunParametersTable parameters={run.parameters || []} />
         </div>
 
         <div className="space-y-2">
           <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-            Evaluation Metrics ({run.metrics?.length || 0})
+            Metrics
           </h3>
           <RunMetricsTable metrics={run.metrics || []} />
         </div>
@@ -215,7 +215,7 @@ export function RunDetailPage() {
       {/* Artifact Viewer / Uploader Section */}
       <div className="space-y-2 pt-2">
         <h3 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-          Run Artifacts & Result Attachments
+          Run Artifacts
         </h3>
         <ArtifactViewer
           runId={run.id}

@@ -4,11 +4,18 @@ import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { authApi } from "@/api/auth"
 import {
   Boxes,
   Shield,
   LogOut,
+  MoreHorizontal,
   User as UserIcon,
   Trash2,
 } from "lucide-react"
@@ -46,9 +53,6 @@ export function AppLayout() {
             <div className="flex items-center gap-2">
               <span className="font-semibold text-lg tracking-wider font-mono">
                 XPORIUM
-              </span>
-              <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded border border-border text-muted-foreground">
-                v1.0
               </span>
             </div>
             <ThemeToggle />
@@ -102,25 +106,33 @@ export function AppLayout() {
               </div>
             </div>
 
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              onClick={handleLogout}
-              title="Sign Out"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-            </Button>
-          </div>
-
-          <div className="px-2">
-            <button
-              onClick={() => setDeleteAccountOpen(true)}
-              className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"
-            >
-              <Trash2 className="w-3 h-3" />
-              Delete account
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
+                    title="Account actions"
+                    className="text-muted-foreground hover:text-foreground"
+                  />
+                }
+              >
+                <MoreHorizontal className="w-3.5 h-3.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="top" align="end">
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="w-3.5 h-3.5" />
+                  Logout
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => setDeleteAccountOpen(true)}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Delete Account
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </aside>

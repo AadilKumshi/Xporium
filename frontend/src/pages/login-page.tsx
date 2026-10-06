@@ -90,7 +90,7 @@ export function LoginPage() {
                 <Input
                   id="username"
                   type="text"
-                  placeholder="e.g. researcher"
+                  placeholder=""
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   disabled={loading}

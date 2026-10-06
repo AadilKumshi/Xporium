@@ -224,3 +224,34 @@ def get_data_configurations(
         )
         .all()
     )
+
+
+@router.delete(
+    "/{experiment_id}/data-configurations/{data_config_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_data_configuration(
+    experiment_id: int,
+    data_config_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    data_config = (
+        db.query(models.DataConfiguration)
+        .join(models.Experiment)
+        .filter(
+            models.DataConfiguration.id == data_config_id,
+            models.DataConfiguration.experiment_id == experiment_id,
+            models.Experiment.user_id == current_user.id,
+        )
+        .first()
+    )
+
+    if data_config is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Data configuration not found",
+        )
+
+    db.delete(data_config)
+    db.commit()

@@ -83,7 +83,7 @@ export function AdminUsersPage() {
             </TableHeader>
             <TableBody>
               {users.map((u) => {
-                const isSelf = u.email === currentUser?.Username
+                const isSelf = u.username === currentUser?.Username
                 const createdDate = new Date(u.created_at).toLocaleDateString(
                   undefined,
                   { month: "short", day: "numeric", year: "numeric" }
@@ -95,7 +95,7 @@ export function AdminUsersPage() {
                       #{u.id}
                     </TableCell>
                     <TableCell className="font-mono text-xs font-medium text-foreground">
-                      {u.email}
+                      {u.username}
                       {isSelf && (
                         <span className="text-[10px] font-normal text-muted-foreground ml-2">
                           (current user)
@@ -141,7 +141,7 @@ export function AdminUsersPage() {
           open={deleteOpen}
           onOpenChange={setDeleteOpen}
           title="Delete User Account?"
-          description={`Are you sure you want to delete user "${selectedUser.email}"? All their experiments, training runs, and artifacts will be permanently purged.`}
+          description={`Are you sure you want to delete user "${selectedUser.username}"? All their experiments, training runs, and artifacts will be permanently purged.`}
           confirmText={deleteMutation.isPending ? "Deleting..." : "Delete User"}
           onConfirm={async () => {
             await deleteMutation.mutateAsync(selectedUser.id)

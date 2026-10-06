@@ -15,10 +15,10 @@ app = FastAPI(title="Xporium", version="1.0.0")
 migrate_user_identity_column()
 models.Base.metadata.create_all(bind=engine)
 app.include_router(authentication_router)
+app.include_router(admin_router)
 app.include_router(runs_router)
 app.include_router(artifacts_router)
 app.include_router(experiments_router)
-app.include_router(admin_router)
 @app.get("/")
 def health_check():
     return {"Status": "Healthy"}

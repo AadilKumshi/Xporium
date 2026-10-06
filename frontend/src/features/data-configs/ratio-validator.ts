@@ -11,7 +11,7 @@ export function validateRatios(
     return {
       valid: false,
       sum,
-      message: `Train + Validation + Test ratios must equal 100% (currently ${currentPercent}%).`,
+      message: `Sum of Ratios must equal 1 (currently ${sum})`,
     }
   }
 

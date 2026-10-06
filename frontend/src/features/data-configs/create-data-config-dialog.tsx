@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { experimentsApi } from "@/api/experiments"
 import { validateRatios } from "./ratio-validator"
 import type { DataConfigurationCreate, PreprocessingStep } from "@/types"
@@ -47,6 +47,16 @@ export function CreateDataConfigDialog({
   const [stratified, setStratified] = useState(false)
 
   const [steps, setSteps] = useState<PreprocessingStep[]>([])
+  const [configurationText, setConfigurationText] = useState<Record<number, string>>({})
+
+  useEffect(() => {
+    if (!open) {
+      return
+    }
+
+    setSteps([])
+    setConfigurationText({})
+  }, [open])
 
   const ratioCheck = validateRatios(trainRatio, validationRatio, testRatio)
 
@@ -55,11 +65,12 @@ export function CreateDataConfigDialog({
       ...prev,
       {
         name: "",
-        type: "normalization",
+        type: "",
         configuration: {},
         step_order: prev.length + 1,
       },
     ])
+    setConfigurationText((prev) => ({ ...prev, [steps.length]: "" }))
   }
 
   const handleRemoveStep = (index: number) => {
@@ -67,6 +78,16 @@ export function CreateDataConfigDialog({
       prev
         .filter((_, i) => i !== index)
         .map((step, idx) => ({ ...step, step_order: idx + 1 }))
+    )
+    setConfigurationText((prev) =>
+      Object.fromEntries(
+        Object.entries(prev)
+          .filter(([key]) => Number(key) !== index)
+          .map(([key, value]) => {
+            const oldIndex = Number(key)
+            return [oldIndex > index ? oldIndex - 1 : oldIndex, value]
+          })
+      )
     )
   }
 
@@ -97,6 +118,19 @@ export function CreateDataConfigDialog({
     for (const step of steps) {
       if (!step.name.trim() || !step.type.trim()) {
         setError("All preprocessing steps must have a name and type.")
+        return
+      }
+    }
+
+    for (const [index, value] of Object.entries(configurationText)) {
+      if (!value.trim()) {
+        continue
+      }
+
+      try {
+        JSON.parse(value)
+      } catch {
+        setError(`Preprocessing step ${Number(index) + 1} has invalid JSON configuration.`)
         return
       }
     }
@@ -155,7 +189,7 @@ export function CreateDataConfigDialog({
               </Label>
               <Input
                 id="dc-name"
-                placeholder="e.g. Baseline Split"
+                placeholder=""
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={loading}
@@ -164,10 +198,10 @@ export function CreateDataConfigDialog({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="dc-version">Dataset Version (optional)</Label>
+              <Label htmlFor="dc-version">Dataset Version</Label>
               <Input
                 id="dc-version"
-                placeholder="e.g. v1.0"
+                placeholder=""
                 value={datasetVersion}
                 onChange={(e) => setDatasetVersion(e.target.value)}
                 disabled={loading}
@@ -176,11 +210,11 @@ export function CreateDataConfigDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="dc-desc">Description (optional)</Label>
+            <Label htmlFor="dc-desc">Description</Label>
             <Textarea
               id="dc-desc"
               rows={2}
-              placeholder="Notes on data preprocessing, filtering, or source..."
+              placeholder="Notes on Data Preprocessing, Filtering or Source..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               disabled={loading}
@@ -191,22 +225,20 @@ export function CreateDataConfigDialog({
           <div className="p-3 rounded-lg border border-border bg-muted/30 space-y-2.5">
             <div className="flex items-center justify-between">
               <Label className="text-xs font-medium">
-                Split Ratios (Train + Val + Test = 100%)
+                Data Split Ratios
               </Label>
               <span
                 className={`text-xs font-mono font-medium ${
                   ratioCheck.valid ? "text-foreground" : "text-muted-foreground underline"
                 }`}
               >
-                Total: {Math.round(ratioCheck.sum * 100)}%{" "}
-                {ratioCheck.valid ? "✓" : "✗"}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 text-xs">
               <div>
                 <Label htmlFor="train-ratio" className="text-[11px] text-muted-foreground">
-                  Train ({Math.round(trainRatio * 100)}%)
+                  Train 
                 </Label>
                 <Input
                   id="train-ratio"
@@ -222,7 +254,7 @@ export function CreateDataConfigDialog({
 
               <div>
                 <Label htmlFor="val-ratio" className="text-[11px] text-muted-foreground">
-                  Val ({Math.round(validationRatio * 100)}%)
+                  Val 
                 </Label>
                 <Input
                   id="val-ratio"
@@ -240,7 +272,7 @@ export function CreateDataConfigDialog({
 
               <div>
                 <Label htmlFor="test-ratio" className="text-[11px] text-muted-foreground">
-                  Test ({Math.round(testRatio * 100)}%)
+                  Test 
                 </Label>
                 <Input
                   id="test-ratio"
@@ -325,7 +357,7 @@ export function CreateDataConfigDialog({
 
             {steps.length === 0 ? (
               <p className="text-xs text-muted-foreground italic">
-                Optional: Add preprocessing operations (e.g. tokenization, resizing, scaling).
+                Optional: Add preprocessing operations (e.g. Tokenization, Resizing, Scaling).
               </p>
             ) : (
               <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
@@ -339,7 +371,7 @@ export function CreateDataConfigDialog({
                         #{step.step_order}
                       </span>
                       <Input
-                        placeholder="Step Name (e.g. Resize)"
+                        placeholder="Step Name (e.g. Scaling)"
                         value={step.name}
                         onChange={(e) =>
                           handleStepChange(idx, "name", e.target.value)
@@ -348,7 +380,7 @@ export function CreateDataConfigDialog({
                         disabled={loading}
                       />
                       <Input
-                        placeholder="Type (e.g. image_resize)"
+                        placeholder="Type (e.g. Normalization)"
                         value={step.type}
                         onChange={(e) =>
                           handleStepChange(idx, "type", e.target.value)
@@ -368,20 +400,21 @@ export function CreateDataConfigDialog({
                     </div>
 
                     <Input
-                      placeholder='Configuration JSON, e.g. {"width": 224, "height": 224}'
-                      value={
-                        step.configuration
-                          ? JSON.stringify(step.configuration)
-                          : ""
-                      }
+                      placeholder='Config JSON, e.g. {"width": 224, "height": 224}'
+                      value={configurationText[idx] ?? ""}
                       onChange={(e) => {
+                        const value = e.target.value
+                        setConfigurationText((prev) => ({
+                          ...prev,
+                          [idx]: value,
+                        }))
                         try {
-                          const parsed = e.target.value
-                            ? JSON.parse(e.target.value)
+                          const parsed = value
+                            ? JSON.parse(value)
                             : {}
                           handleStepChange(idx, "configuration", parsed)
                         } catch {
-                          // Allow typing partial string until valid
+                          // Keep the raw input until it becomes valid JSON.
                         }
                       }}
                       className="h-7 font-mono text-[11px]"

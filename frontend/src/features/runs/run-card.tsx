@@ -40,7 +40,7 @@ export function RunCard({
   return (
     <>
       <Card className="border border-border hover:border-foreground/30 transition-colors">
-        <CardHeader className="flex flex-row items-start justify-between pb-2">
+        <CardHeader className="flex flex-row items-start justify-between pb-0">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <CardTitle className="text-sm font-semibold font-mono">
@@ -65,7 +65,7 @@ export function RunCard({
           </Button>
         </CardHeader>
 
-        <CardContent className="space-y-2.5 text-xs text-muted-foreground pt-1">
+        <CardContent className="space-y-3 text-xs text-muted-foreground pt-0">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-muted-foreground" />

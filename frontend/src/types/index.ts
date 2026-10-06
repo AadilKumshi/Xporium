@@ -7,7 +7,7 @@ export interface User {
 
 export interface AdminUser {
   id: number
-  email: string
+  username: string
   role: UserRole
   created_at: string
 }

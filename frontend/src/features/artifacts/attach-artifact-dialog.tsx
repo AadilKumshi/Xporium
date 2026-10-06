@@ -59,9 +59,9 @@ export function AttachArtifactDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Attach Result / Artifact</DialogTitle>
+          <DialogTitle>Attach Artifact</DialogTitle>
           <DialogDescription>
-            Attach visual outputs (plots, charts) and analytical notes to this run.
+            Attach Visual Outputs (Plots, Charts) or Analytical Notes
           </DialogDescription>
         </DialogHeader>
 
@@ -73,7 +73,7 @@ export function AttachArtifactDialog({
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="artifact-image">Plot / Image File</Label>
+            <Label htmlFor="artifact-image">Image File</Label>
             <div className="border border-input rounded-lg p-3 bg-muted/20">
               <input
                 id="artifact-image"
@@ -92,11 +92,11 @@ export function AttachArtifactDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="artifact-note">Analysis / Observations Note</Label>
+            <Label htmlFor="artifact-note">Observations Note</Label>
             <Textarea
               id="artifact-note"
               rows={3}
-              placeholder="e.g. Validation accuracy plateaued after epoch 6. Best weights saved."
+              placeholder=""
               value={note}
               onChange={(e) => setNote(e.target.value)}
               disabled={loading}

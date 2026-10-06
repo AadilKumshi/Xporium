@@ -97,7 +97,7 @@ export function CreateExperimentDialog({
         <DialogHeader>
           <DialogTitle>New Experiment</DialogTitle>
           <DialogDescription>
-            Initialize a new machine learning experiment container.
+            Initialize a new Machine Learning Experiment
           </DialogDescription>
         </DialogHeader>
 
@@ -114,7 +114,7 @@ export function CreateExperimentDialog({
             </Label>
             <Input
               id="exp-name"
-              placeholder="e.g. EuroSAT Transfer Learning"
+              placeholder=""
               value={formData.name}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, name: e.target.value }))
@@ -131,7 +131,7 @@ export function CreateExperimentDialog({
               </Label>
               <Input
                 id="exp-dataset"
-                placeholder="e.g. EuroSAT"
+                placeholder=""
                 value={formData.dataset_name}
                 onChange={(e) =>
                   setFormData((prev) => ({
@@ -172,8 +172,9 @@ export function CreateExperimentDialog({
             <Textarea
               id="exp-desc"
               rows={2}
-              placeholder="Hypothesis, baseline expectations, notes..."
+              placeholder="Hypothesis, Baseline Expectations, Notes..."
               value={formData.description}
+              className="h-40 min-h-40 max-h-40 resize-none overflow-x-hidden overflow-y-auto"
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, description: e.target.value }))
               }

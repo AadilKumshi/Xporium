@@ -85,7 +85,7 @@ export function ThemeProvider({
 }: ThemeProviderProps) {
   const [theme, setThemeState] = React.useState<Theme>(() => {
     const storedTheme = localStorage.getItem(storageKey)
-    if (isTheme(storedTheme)) {
+    if (storedTheme === "dark" || storedTheme === "light") {
       return storedTheme
     }
 

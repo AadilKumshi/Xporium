@@ -105,7 +105,7 @@ def delete_experiment(
 
 
 
-@router.get("/runs", response_model=list[schemas.RunResponse], status_code=status.HTTP_200_OK)
+@router.get("/runs", response_model=list[schemas.AdminRunResponse], status_code=status.HTTP_200_OK)
 def get_all_runs(
     current_user: models.User = Depends(get_admin_user),
     db: Session = Depends(database.get_db),

@@ -73,6 +73,7 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-content"
       className={cn("px-(--card-spacing)", className)}
+      style={{ paddingBottom: "10px" }}
       {...props}
     />
   )

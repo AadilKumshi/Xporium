@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { runsApi } from "@/api/runs"
 import type {
   DataConfiguration,
@@ -55,6 +55,19 @@ export function CreateRunDialog({
   const [dataConfigId, setDataConfigId] = useState<string>(
     dataConfigs[0]?.id ? String(dataConfigs[0].id) : ""
   )
+  useEffect(() => {
+    if (!open) {
+      return
+    }
+
+    const selectedConfigStillExists = dataConfigs.some(
+      (config) => String(config.id) === dataConfigId
+    )
+
+    if (!selectedConfigStillExists) {
+      setDataConfigId(dataConfigs[0]?.id ? String(dataConfigs[0].id) : "")
+    }
+  }, [open, dataConfigs, dataConfigId])
   const [modelName, setModelName] = useState("")
   const [trainingDuration, setTrainingDuration] = useState("120.0")
   const [environmentType, setEnvironmentType] =
@@ -62,12 +75,12 @@ export function CreateRunDialog({
   const [environmentSpecs, setEnvironmentSpecs] = useState("")
 
   const [parameters, setParameters] = useState<ParamRow[]>([
-    { name: "learning_rate", value: "0.001", type: "float" },
-    { name: "batch_size", value: "32", type: "integer" },
+    { name: "Learning Rate", value: "0.001", type: "float" },
+    { name: "Batch Size", value: "32", type: "integer" },
   ])
 
   const [metrics, setMetrics] = useState<MetricRow[]>([
-    { name: "accuracy", value: "0.95", split: "validation" },
+    { name: "Accuracy", value: "0.95", split: "validation" },
   ])
 
   const handleAddParam = () => {
@@ -182,7 +195,7 @@ export function CreateRunDialog({
         <DialogHeader>
           <DialogTitle>Record Training Run</DialogTitle>
           <DialogDescription>
-            Log execution specs, hyperparameters, and test results for this model run.
+            Execution Specs, Hyperparameters and Test Results for this Model Run
           </DialogDescription>
         </DialogHeader>
 
@@ -221,7 +234,7 @@ export function CreateRunDialog({
               </Label>
               <Input
                 id="run-model"
-                placeholder="e.g. ResNet50, BERT-base"
+                placeholder="e.g. SVM, Random Forest"
                 value={modelName}
                 onChange={(e) => setModelName(e.target.value)}
                 disabled={loading}
@@ -299,7 +312,7 @@ export function CreateRunDialog({
                 {parameters.map((p, idx) => (
                   <div key={idx} className="flex items-center gap-2">
                     <Input
-                      placeholder="Name (e.g. lr)"
+                      placeholder="Name"
                       value={p.name}
                       onChange={(e) =>
                         handleParamChange(idx, "name", e.target.value)
@@ -329,10 +342,10 @@ export function CreateRunDialog({
                       className="w-24 shrink-0"
                       disabled={loading}
                     >
-                      <NativeSelectOption value="string">string</NativeSelectOption>
-                      <NativeSelectOption value="float">float</NativeSelectOption>
-                      <NativeSelectOption value="integer">integer</NativeSelectOption>
-                      <NativeSelectOption value="boolean">boolean</NativeSelectOption>
+                      <NativeSelectOption value="string">String</NativeSelectOption>
+                      <NativeSelectOption value="float">Float</NativeSelectOption>
+                      <NativeSelectOption value="integer">Integer</NativeSelectOption>
+                      <NativeSelectOption value="boolean">Boolean</NativeSelectOption>
                     </NativeSelect>
                     <Button
                       type="button"
@@ -373,7 +386,7 @@ export function CreateRunDialog({
                 {metrics.map((m, idx) => (
                   <div key={idx} className="flex items-center gap-2">
                     <Input
-                      placeholder="Metric (e.g. accuracy)"
+                      placeholder="Metric"
                       value={m.name}
                       onChange={(e) =>
                         handleMetricChange(idx, "name", e.target.value)
@@ -382,7 +395,7 @@ export function CreateRunDialog({
                       disabled={loading}
                     />
                     <Input
-                      placeholder="Value (e.g. 0.95)"
+                      placeholder="Value"
                       type="number"
                       step="any"
                       value={m.value}
@@ -405,9 +418,9 @@ export function CreateRunDialog({
                       className="w-28 shrink-0"
                       disabled={loading}
                     >
-                      <NativeSelectOption value="validation">validation</NativeSelectOption>
-                      <NativeSelectOption value="train">train</NativeSelectOption>
-                      <NativeSelectOption value="test">test</NativeSelectOption>
+                      <NativeSelectOption value="train">Train</NativeSelectOption>
+                      <NativeSelectOption value="validation">Validation</NativeSelectOption>
+                      <NativeSelectOption value="test">Test</NativeSelectOption>
                     </NativeSelect>
                     <Button
                       type="button"
