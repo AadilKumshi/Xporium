@@ -7,7 +7,6 @@ export function validateRatios(
   const valid = Math.abs(sum - 1.0) < 1e-4
 
   if (!valid) {
-    const currentPercent = Math.round(sum * 100)
     return {
       valid: false,
       sum,
