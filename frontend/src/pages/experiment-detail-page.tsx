@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useParams, useNavigate, useSearchParams } from "react-router-dom"
+import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import type { DataConfiguration } from "@/types"
 import { experimentsApi } from "@/api/experiments"
@@ -32,6 +32,8 @@ export function ExperimentDetailPage() {
   const { id } = useParams<{ id: string }>()
   const experimentId = parseInt(id || "0", 10)
   const navigate = useNavigate()
+  const location = useLocation()
+  const isLibrary = location.pathname.startsWith("/library/")
   const [searchParams] = useSearchParams()
   const queryClient = useQueryClient()
 
@@ -48,22 +50,31 @@ export function ExperimentDetailPage() {
     isLoading: expLoading,
     error: expError,
   } = useQuery({
-    queryKey: ["experiment", experimentId],
-    queryFn: () => experimentsApi.getById(experimentId),
+    queryKey: ["experiment", experimentId, isLibrary],
+    queryFn: () =>
+      isLibrary
+        ? experimentsApi.getLibraryById(experimentId)
+        : experimentsApi.getById(experimentId),
     enabled: !!experimentId,
   })
 
   // Fetch Data Configurations
   const { data: dataConfigs = [], isLoading: configsLoading } = useQuery({
-    queryKey: ["data-configs", experimentId],
-    queryFn: () => experimentsApi.listDataConfigs(experimentId),
+    queryKey: ["data-configs", experimentId, isLibrary],
+    queryFn: () =>
+      isLibrary
+        ? experimentsApi.listLibraryDataConfigs(experimentId)
+        : experimentsApi.listDataConfigs(experimentId),
     enabled: !!experimentId,
   })
 
   // Fetch Runs
   const { data: runs = [], isLoading: runsLoading } = useQuery({
-    queryKey: ["runs", experimentId],
-    queryFn: () => runsApi.listByExperiment(experimentId),
+    queryKey: ["runs", experimentId, isLibrary],
+    queryFn: () =>
+      isLibrary
+        ? runsApi.listLibraryByExperiment(experimentId)
+        : runsApi.listByExperiment(experimentId),
     enabled: !!experimentId,
   })
 
@@ -140,7 +151,7 @@ export function ExperimentDetailPage() {
           <Button
             variant="ghost"
             size="icon-xs"
-            onClick={() => navigate("/experiments")}
+            onClick={() => navigate(isLibrary ? "/library" : "/experiments")}
             className="text-muted-foreground hover:text-foreground"
             title="Back"
           >
@@ -177,7 +188,7 @@ export function ExperimentDetailPage() {
             </a>
           )}
 
-          <Button
+          {!isLibrary && <Button
             variant="outline"
             size="sm"
             onClick={() => setEditOpen(true)}
@@ -185,9 +196,9 @@ export function ExperimentDetailPage() {
           >
             <Edit3 className="w-3.5 h-3.5 mr-1" />
             Edit
-          </Button>
+          </Button>}
 
-          <Button
+          {!isLibrary && <Button
             variant="ghost"
             size="sm"
             onClick={() => setDeleteOpen(true)}
@@ -195,7 +206,7 @@ export function ExperimentDetailPage() {
           >
             <Trash2 className="w-3.5 h-3.5 mr-1" />
             Delete
-          </Button>
+          </Button>}
         </div>
       </div>
 
@@ -266,14 +277,14 @@ export function ExperimentDetailPage() {
             <p className="text-xs text-muted-foreground">
               Define partition ratios and preprocessing operations.
             </p>
-            <Button
+            {!isLibrary && <Button
               onClick={() => setCreateDataConfigOpen(true)}
               size="sm"
               className="bg-foreground text-background hover:bg-foreground/90 font-medium text-xs"
             >
               <Plus className="w-3.5 h-3.5 mr-1" />
               Add Dataset Configuration
-            </Button>
+            </Button>}
           </div>
 
           {configsLoading ? (
@@ -287,7 +298,7 @@ export function ExperimentDetailPage() {
               title="No dataset configurations"
               description="Configure how your dataset was prepared, split, and preprocessed before recording training runs."
               actionLabel="Add Dataset Configuration"
-              onAction={() => setCreateDataConfigOpen(true)}
+              onAction={isLibrary ? undefined : () => setCreateDataConfigOpen(true)}
             />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -296,6 +307,7 @@ export function ExperimentDetailPage() {
                   key={cfg.id}
                   config={cfg}
                   onDelete={setDataConfigToDelete}
+                  readOnly={isLibrary}
                 />
               ))}
             </div>
@@ -308,7 +320,7 @@ export function ExperimentDetailPage() {
             <p className="text-xs text-muted-foreground">
               Record hyperparameters, evaluation metrics, and artifacts.
             </p>
-            <Button
+            {!isLibrary && <Button
               onClick={() => setCreateRunOpen(true)}
               size="sm"
               disabled={configsList.length === 0}
@@ -321,13 +333,13 @@ export function ExperimentDetailPage() {
             >
               <PlayCircle className="w-3.5 h-3.5 mr-1" />
               Record Training Run
-            </Button>
+            </Button>}
           </div>
 
           {configsList.length === 0 && (
             <div className="rounded border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
-              💡 Please create at least one <strong>Data Configuration</strong>{" "}
-              before recording a training run.
+              Please create at least one <strong>Data Configuration</strong>{" "}
+              before recording a training run!
             </div>
           )}
 
@@ -342,14 +354,15 @@ export function ExperimentDetailPage() {
               title="No training runs recorded yet"
               description="Log training duration, hyperparameters, and test metrics for this experiment."
               actionLabel={configsList.length > 0 ? "Record Training Run" : undefined}
-              onAction={() => setCreateRunOpen(true)}
+              onAction={isLibrary ? undefined : () => setCreateRunOpen(true)}
             />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4" id="runs-container">
-              {runsList.map((run) => (
+              {runsList.map((run, index) => (
                 <RunCard
                   key={run.id}
                   run={run}
+                  runNumber={index + 1}
                   experimentId={experimentId}
                   onDelete={async (runId) => {
                     await runsApi.delete(runId)
@@ -362,6 +375,7 @@ export function ExperimentDetailPage() {
                       queryKey: ["runs", experimentId],
                     })
                   }}
+                  readOnly={isLibrary}
                 />
               ))}
             </div>

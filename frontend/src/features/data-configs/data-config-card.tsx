@@ -15,16 +15,17 @@ import {
 
 interface DataConfigCardProps {
   config: DataConfiguration
-  onDelete: (config: DataConfiguration) => void
+  onDelete?: (config: DataConfiguration) => void
+  readOnly?: boolean
 }
 
-export function DataConfigCard({ config, onDelete }: DataConfigCardProps) {
+export function DataConfigCard({ config, onDelete, readOnly = false }: DataConfigCardProps) {
   const [stepsOpen, setStepsOpen] = useState(false)
 
   const steps = config.preprocessing_steps || []
 
   return (
-    <Card className="border border-border">
+    <Card className="border border-border h-full">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -52,15 +53,15 @@ export function DataConfigCard({ config, onDelete }: DataConfigCardProps) {
                 </span>
               )}
             </div>
-            <Button
+            {!readOnly && <Button
               variant="ghost"
               size="icon-xs"
-              onClick={() => onDelete(config)}
+              onClick={() => onDelete?.(config)}
               title="Delete data configuration"
               className="text-muted-foreground hover:text-foreground"
             >
               <Trash2 className="w-3.5 h-3.5" />
-            </Button>
+            </Button>}
           </div>
         </div>
 
@@ -84,7 +85,7 @@ export function DataConfigCard({ config, onDelete }: DataConfigCardProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
               <Layers className="w-3.5 h-3.5 text-muted-foreground" />
-              <span>Preprocessing Steps ({steps.length})</span>
+              <span>Preprocessing Steps - {steps.length}</span>
             </div>
 
             {steps.length > 0 && (
@@ -103,11 +104,7 @@ export function DataConfigCard({ config, onDelete }: DataConfigCardProps) {
             )}
           </div>
 
-          {steps.length === 0 ? (
-            <p className="text-xs text-muted-foreground mt-1.5 italic">
-              No preprocessing steps configured
-            </p>
-          ) : stepsOpen ? (
+          {stepsOpen ? (
             <div className="mt-3 space-y-2">
               {steps
                 .sort((a, b) => a.step_order - b.step_order)

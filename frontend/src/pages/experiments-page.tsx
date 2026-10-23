@@ -47,7 +47,7 @@ export function ExperimentsPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-foreground font-mono">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground font-mono">
             EXPERIMENTS
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -64,17 +64,18 @@ export function ExperimentsPage() {
         </Button>
       </div>
 
-      {/* Search Bar */}
-      <div className="relative w-full max-w-md">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          type="text"
-          placeholder="Filter experiments by name, dataset, or type..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9 bg-card border-border"
-        />
-      </div>
+      {experiments.length > 0 && (
+        <div className="relative w-full max-w-md">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Filter Experiments by Name, Dataset, or Type..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 bg-card border-border"
+          />
+        </div>
+      )}
 
       {/* Content Feed */}
       {isLoading ? (

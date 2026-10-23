@@ -8,6 +8,33 @@ from app.security.Oauth2 import get_current_user
 router = APIRouter(tags=["Runs"])
 
 
+@router.get("/library/{experiment_id}/runs", response_model=list[schemas.RunResponse])
+def get_library_runs(
+    experiment_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    experiment = (
+        db.query(models.Experiment)
+        .join(models.LibraryExperiment)
+        .filter(
+            models.Experiment.id == experiment_id,
+            models.LibraryExperiment.user_id == current_user.id,
+        )
+        .first()
+    )
+    if experiment is None:
+        raise HTTPException(status_code=404, detail="Library experiment not found")
+
+    return (
+        db.query(models.Run)
+        .join(models.DataConfiguration)
+        .filter(models.DataConfiguration.experiment_id == experiment_id)
+        .order_by(models.Run.created_at.asc(), models.Run.id.asc())
+        .all()
+    )
+
+
 
 
 
@@ -50,6 +77,19 @@ def create_run(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Data configuration not found"
         )
+
+    metric_keys: set[tuple[str, models.MetricSplit]] = set()
+    for metric in run.metrics:
+        key = (metric.name.strip().casefold(), metric.split)
+        if key in metric_keys:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=(
+                    f'Metric "{metric.name.strip()}" is duplicated for the '
+                    f"{metric.split.value} split"
+                ),
+            )
+        metric_keys.add(key)
 
     # 3. Create the Run
     new_run = models.Run(
@@ -125,6 +165,7 @@ def get_runs(
         .filter(
             models.DataConfiguration.experiment_id == experiment_id
         )
+        .order_by(models.Run.created_at.asc(), models.Run.id.asc())
         .all()
     )
 

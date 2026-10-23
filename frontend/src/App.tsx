@@ -9,6 +9,7 @@ import { AdminLayout } from "@/components/layout/admin-layout"
 import { LoginPage } from "@/pages/login-page"
 import { RegisterPage } from "@/pages/register-page"
 import { ExperimentsPage } from "@/pages/experiments-page"
+import { LibraryPage } from "@/pages/library-page"
 import { ExperimentDetailPage } from "@/pages/experiment-detail-page"
 import { RunDetailPage } from "@/pages/run-detail-page"
 import { AdminOverviewPage } from "@/pages/admin/admin-overview-page"
@@ -42,10 +43,12 @@ export function App() {
               <Route element={<AppLayout />}>
                 <Route path="/" element={<Navigate to="/experiments" replace />} />
                 <Route path="/experiments" element={<ExperimentsPage />} />
+                <Route path="/library" element={<LibraryPage />} />
                 <Route
                   path="/experiments/:id"
                   element={<ExperimentDetailPage />}
                 />
+                <Route path="/library/:id" element={<ExperimentDetailPage />} />
                 <Route
                   path="/experiments/:id/runs/:runId"
                   element={<RunDetailPage />}

@@ -38,6 +38,20 @@ class ExperimentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class ShareCodeResponse(BaseModel):
+    code: str
+    expires_at: datetime
+
+
+class LibraryExperimentResponse(ExperimentResponse):
+    owner_username: str
+    added_at: datetime
+
+
+class RedeemShareCodeRequest(BaseModel):
+    code: str = Field(min_length=6, max_length=6, pattern=r"^\d{6}$")
+
+
 
 class PreprocessingStepCreate(BaseModel):
     name: str = Field(min_length=1)

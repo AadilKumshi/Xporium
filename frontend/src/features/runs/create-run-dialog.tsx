@@ -159,6 +159,18 @@ export function CreateRunDialog({
       }
     }
 
+    const metricKeys = new Set<string>()
+    for (const metric of metrics) {
+      const key = `${metric.name.trim().toLowerCase()}|${metric.split}`
+      if (metricKeys.has(key)) {
+        setError(
+          `The metric "${metric.name.trim()}" is already recorded for the ${metric.split} split.`
+        )
+        return
+      }
+      metricKeys.add(key)
+    }
+
     setLoading(true)
     try {
       const payload: RunCreate = {

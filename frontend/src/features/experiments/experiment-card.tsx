@@ -6,28 +6,34 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
 import { EditExperimentDialog } from "./edit-experiment-dialog"
-import { Database, Calendar, Edit3, Trash2, ArrowUpRight } from "lucide-react"
+import { Database, Calendar, Edit3, Trash2, ArrowUpRight, Share2 } from "lucide-react"
+import { ShareExperimentDialog } from "./share-experiment-dialog"
 
 interface ExperimentCardProps {
   experiment: Experiment
-  onDelete: (id: number) => Promise<void>
-  onUpdated: () => void
+  onDelete?: (id: number) => Promise<void>
+  onUpdated?: () => void
+  readOnly?: boolean
 }
 
 export function ExperimentCard({
   experiment,
   onDelete,
   onUpdated,
+  readOnly = false,
 }: ExperimentCardProps) {
   const navigate = useNavigate()
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
 
   const handleDelete = async () => {
     setIsDeleting(true)
     try {
-      await onDelete(experiment.id)
+      if (onDelete) {
+        await onDelete(experiment.id)
+      }
     } finally {
       setIsDeleting(false)
     }
@@ -57,7 +63,9 @@ export function ExperimentCard({
             <Button
               variant="outline"
               size="icon-xs"
-              onClick={() => navigate(`/experiments/${experiment.id}`)}
+              onClick={() =>
+                navigate(`${readOnly ? "/library" : "/experiments"}/${experiment.id}`)
+              }
               title="Open Experiment"
               className="shrink-0"
             >
@@ -74,7 +82,10 @@ export function ExperimentCard({
               <div className="flex items-center gap-2">
                 <Database className="w-3.5 h-3.5 shrink-0" />
                 <span className="truncate">
-                  Dataset: <strong className="text-foreground">{experiment.dataset_name}</strong>
+                  Dataset:{" "}
+                  <strong className="font-medium text-foreground">
+                    {experiment.dataset_name}
+                  </strong>
                 </span>
               </div>
 
@@ -87,25 +98,40 @@ export function ExperimentCard({
         </div>
 
         <CardFooter className="border-t border-border/60 pt-3 flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="xs"
-            onClick={() => setEditOpen(true)}
-            className="text-xs text-muted-foreground hover:text-foreground"
-          >
-            <Edit3 className="w-3 h-3 mr-1" />
-            Edit
-          </Button>
+          {readOnly ? (
+            <span className="text-xs text-muted-foreground">Read-Only Copy</span>
+          ) : (
+            <>
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => setShareOpen(true)}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                <Share2 className="w-3 h-3 mr-1" />
+                Share
+              </Button>
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => setEditOpen(true)}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                <Edit3 className="w-3 h-3 mr-1" />
+                Edit
+              </Button>
 
-          <Button
-            variant="ghost"
-            size="xs"
-            onClick={() => setDeleteOpen(true)}
-            className="text-xs text-muted-foreground hover:text-foreground"
-          >
-            <Trash2 className="w-3 h-3 mr-1" />
-            Delete
-          </Button>
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => setDeleteOpen(true)}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                <Trash2 className="w-3 h-3 mr-1" />
+                Delete
+              </Button>
+            </>
+          )}
         </CardFooter>
       </Card>
 
@@ -113,7 +139,7 @@ export function ExperimentCard({
         open={editOpen}
         onOpenChange={setEditOpen}
         experiment={experiment}
-        onUpdated={onUpdated}
+        onUpdated={onUpdated ?? (() => undefined)}
       />
 
       <ConfirmDialog
@@ -124,6 +150,13 @@ export function ExperimentCard({
         confirmText={isDeleting ? "Deleting..." : "Delete Experiment"}
         onConfirm={handleDelete}
       />
+      {!readOnly && (
+        <ShareExperimentDialog
+          experiment={experiment}
+          open={shareOpen}
+          onOpenChange={setShareOpen}
+        />
+      )}
     </>
   )
 }

@@ -33,6 +33,16 @@ export interface Experiment {
   updated_at: string
 }
 
+export interface LibraryExperiment extends Experiment {
+  owner_username: string
+  added_at: string
+}
+
+export interface ShareCode {
+  code: string
+  expires_at: string
+}
+
 export interface ExperimentCreate {
   name: string
   description?: string | null

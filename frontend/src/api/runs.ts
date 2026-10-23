@@ -2,6 +2,9 @@ import { apiClient } from "./client"
 import type { Run, RunCreate, RunUpdate } from "@/types"
 
 export const runsApi = {
+  listLibraryByExperiment: async (experimentId: number): Promise<Run[]> => {
+    return apiClient<Run[]>(`/library/${experimentId}/runs`)
+  },
   listByExperiment: async (experimentId: number): Promise<Run[]> => {
     return apiClient<Run[]>(`/${experimentId}/runs`)
   },

@@ -5,6 +5,8 @@ import type {
   ExperimentUpdate,
   DataConfiguration,
   DataConfigurationCreate,
+  LibraryExperiment,
+  ShareCode,
 } from "@/types"
 
 export const experimentsApi = {
@@ -39,6 +41,31 @@ export const experimentsApi = {
     return apiClient<null>(`/experiments/${id}`, {
       method: "DELETE",
     })
+  },
+
+  createShareCode: async (id: number): Promise<ShareCode> => {
+    return apiClient<ShareCode>(`/experiments/${id}/share`, { method: "POST" })
+  },
+
+  listLibrary: async (): Promise<LibraryExperiment[]> => {
+    return apiClient<LibraryExperiment[]>("/experiments/library")
+  },
+
+  redeemShareCode: async (code: string): Promise<LibraryExperiment> => {
+    return apiClient<LibraryExperiment>("/experiments/library", {
+      method: "POST",
+      body: JSON.stringify({ code }),
+    })
+  },
+
+  getLibraryById: async (id: number): Promise<Experiment | null> => {
+    return apiClient<Experiment>(`/experiments/library/${id}`)
+  },
+
+  listLibraryDataConfigs: async (id: number): Promise<DataConfiguration[]> => {
+    return apiClient<DataConfiguration[]>(
+      `/experiments/library/${id}/data-configurations`
+    )
   },
 
   listDataConfigs: async (

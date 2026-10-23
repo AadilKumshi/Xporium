@@ -10,16 +10,20 @@ import { Clock, Cpu, Edit3, Trash2, ArrowUpRight } from "lucide-react"
 
 interface RunCardProps {
   run: Run
+  runNumber: number
   experimentId: number
   onDelete: (id: number) => Promise<void>
   onUpdated: () => void
+  readOnly?: boolean
 }
 
 export function RunCard({
   run,
+  runNumber,
   experimentId,
   onDelete,
   onUpdated,
+  readOnly = false,
 }: RunCardProps) {
   const navigate = useNavigate()
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -44,7 +48,7 @@ export function RunCard({
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <CardTitle className="text-sm font-semibold font-mono">
-                Run #{run.id}
+                Run #{runNumber}
               </CardTitle>
               <Badge variant="outline" className="font-mono text-[10px] uppercase">
                 {run.environment_type}
@@ -58,7 +62,8 @@ export function RunCard({
           <Button
             variant="outline"
             size="icon-xs"
-            onClick={() => navigate(`/experiments/${experimentId}/runs/${run.id}`)}
+            disabled={readOnly}
+            onClick={() => navigate(`${readOnly ? "/library" : "/experiments"}/${experimentId}/runs/${run.id}`)}
             title="Open Run Details"
           >
             <ArrowUpRight className="w-3.5 h-3.5" />
@@ -99,7 +104,7 @@ export function RunCard({
             {run.parameters?.length || 0} params • {run.metrics?.length || 0} metrics
           </span>
 
-          <div className="flex items-center gap-1">
+          {!readOnly && <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="xs"
@@ -119,25 +124,25 @@ export function RunCard({
               <Trash2 className="w-3 h-3 mr-1" />
               Delete
             </Button>
-          </div>
+          </div>}
         </CardFooter>
       </Card>
 
-      <EditRunDialog
+      {!readOnly && <EditRunDialog
         open={editOpen}
         onOpenChange={setEditOpen}
         run={run}
         onUpdated={onUpdated}
-      />
+      />}
 
-      <ConfirmDialog
+      {!readOnly && <ConfirmDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
         title="Delete Training Run?"
-        description={`This will permanently delete Run #${run.id} (${run.model_name}) along with its parameters, metrics, and artifact.\n\nThis action cannot be undone.`}
+        description={`This will permanently delete Run #${runNumber} (${run.model_name}) along with its parameters, metrics, and artifact.\n\nThis action cannot be undone.`}
         confirmText={isDeleting ? "Deleting..." : "Delete Run"}
         onConfirm={handleDelete}
-      />
+      />}
     </>
   )
 }

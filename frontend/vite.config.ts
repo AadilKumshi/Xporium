@@ -46,6 +46,12 @@ export default defineConfig({
         autoRewrite: true,
         bypass: (req) => (req.headers.accept?.includes("text/html") ? "/index.html" : undefined),
       },
+      "/library": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+        autoRewrite: true,
+        bypass: (req) => (req.headers.accept?.includes("text/html") ? "/index.html" : undefined),
+      },
       "/run": {
         target: "http://127.0.0.1:8000",
         changeOrigin: true,
