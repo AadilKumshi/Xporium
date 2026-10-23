@@ -70,6 +70,12 @@ class User(Base):
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
+    library_experiments = relationship(
+        "LibraryExperiment",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
 
 
 class Experiment(Base):
@@ -119,6 +125,68 @@ class Experiment(Base):
         secondaryjoin="Run.data_config_id == DataConfiguration.id",
         viewonly=True,
     )
+    share_tokens = relationship(
+        "ExperimentShareToken",
+        back_populates="experiment",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+    library_entries = relationship(
+        "LibraryExperiment",
+        back_populates="experiment",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+
+
+class ExperimentShareToken(Base):
+    __tablename__ = "experiment_share_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    experiment_id = Column(
+        Integer,
+        ForeignKey("experiments.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    owner_id = Column(
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    code = Column(String(6), unique=True, nullable=False, index=True)
+    expires_at = Column(DateTime(timezone=True), nullable=False, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    experiment = relationship("Experiment", back_populates="share_tokens")
+    owner = relationship("User")
+
+
+class LibraryExperiment(Base):
+    __tablename__ = "library_experiments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    experiment_id = Column(
+        Integer,
+        ForeignKey("experiments.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    added_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "experiment_id", name="uq_library_user_experiment"),
+    )
+
+    user = relationship("User", back_populates="library_experiments")
+    experiment = relationship("Experiment", back_populates="library_entries")
 
 
 class DataConfiguration(Base):

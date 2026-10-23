@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from fastapi import UploadFile, File
+from fastapi import UploadFile, File, Form
 import base64
 from app.database import database, models, schemas
 from app.security.Oauth2 import get_current_user
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/run", tags=["Artifacts"])
 async def create_artifact(
     run_id: int,
     image: UploadFile | None = File(default=None),
-    note: str | None = None,
+    note: str | None = Form(default=None),
     db: Session = Depends(database.get_db),
     current_user: models.User = Depends(get_current_user)
 ):

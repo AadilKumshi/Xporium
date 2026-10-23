@@ -38,6 +38,20 @@ class ExperimentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class ShareCodeResponse(BaseModel):
+    code: str
+    expires_at: datetime
+
+
+class LibraryExperimentResponse(ExperimentResponse):
+    owner_username: str
+    added_at: datetime
+
+
+class RedeemShareCodeRequest(BaseModel):
+    code: str = Field(min_length=6, max_length=6, pattern=r"^\d{6}$")
+
+
 
 class PreprocessingStepCreate(BaseModel):
     name: str = Field(min_length=1)
@@ -176,6 +190,18 @@ class RunResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class AdminRunResponse(BaseModel):
+    id: int
+    data_config_id: int
+    model_name: str
+    training_duration: float
+    environment_type: TrainingEnvironment
+    environment_specs: str | None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class RunUpdate(BaseModel):
     model_name: str | None = Field(default=None, min_length=1)
     training_duration: float | None = Field(default=None, ge=0)
@@ -211,7 +237,7 @@ class AdminOverviewResponse(BaseModel):
 
 class AdminUserResponse(BaseModel):
     id: int
-    email: str
+    username: str
     role: models.UserRole
     created_at: datetime
 
