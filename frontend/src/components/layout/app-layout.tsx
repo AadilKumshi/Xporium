@@ -68,27 +68,24 @@ export function AppLayout() {
                 XPORIUM
               </span>
             </div>
-            {sidebarOpen && <ThemeToggle />}
-          </div>
-
-          <div
-            className={`flex ${sidebarOpen ? "justify-end" : "justify-center"}`}
-          >
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              title={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-              aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-              aria-expanded={sidebarOpen}
-              onClick={() => setSidebarOpen((open) => !open)}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              {sidebarOpen ? (
-                <PanelLeftClose className="h-3.5 w-3.5" />
-              ) : (
-                <PanelLeftOpen className="h-3.5 w-3.5" />
-              )}
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                title={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+                aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+                aria-expanded={sidebarOpen}
+                onClick={() => setSidebarOpen((open) => !open)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                {sidebarOpen ? (
+                  <PanelLeftClose className="h-3.5 w-3.5" />
+                ) : (
+                  <PanelLeftOpen className="h-3.5 w-3.5" />
+                )}
+              </Button>
+              {sidebarOpen && <ThemeToggle />}
+            </div>
           </div>
 
           <nav className="space-y-1">
