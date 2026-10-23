@@ -10,6 +10,8 @@ export class ApiError extends Error {
   }
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? ""
+
 export function formatErrorMessage(status: number, data: any): string {
   if (!data) {
     return `Request failed with status ${status}`
@@ -59,7 +61,7 @@ export async function apiClient<T>(
     headers.set("Content-Type", "application/json")
   }
 
-  const response = await fetch(endpoint, {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers,
   })
