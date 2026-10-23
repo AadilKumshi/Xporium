@@ -101,7 +101,7 @@ export function AppLayout() {
                 }`
               }
             >
-              <Boxes className="h-4 w-4" />
+              <Boxes className={sidebarOpen ? "h-4 w-4" : "h-5 w-5"} />
               {sidebarOpen && "Experiments"}
             </NavLink>
             <NavLink
@@ -116,7 +116,7 @@ export function AppLayout() {
                 }`
               }
             >
-              <LibraryBig className="h-4 w-4" />
+              <LibraryBig className={sidebarOpen ? "h-4 w-4" : "h-5 w-5"} />
               {sidebarOpen && "Library"}
             </NavLink>
 
@@ -133,7 +133,7 @@ export function AppLayout() {
                   }`
                 }
               >
-                <Shield className="h-4 w-4" />
+                <Shield className={sidebarOpen ? "h-4 w-4" : "h-5 w-5"} />
                 {sidebarOpen && "Admin Console"}
               </NavLink>
             )}
@@ -143,7 +143,7 @@ export function AppLayout() {
         {/* User footer */}
         <div className="space-y-3 border-t border-border pt-4">
           <div
-            className={`flex items-center px-2 ${
+            className={`flex items-center ${sidebarOpen ? "px-2" : "px-0"} ${
               sidebarOpen ? "justify-between" : "justify-center"
             }`}
           >
