@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Link, useNavigate, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { authApi } from "@/api/auth"
 import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
@@ -16,6 +16,10 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
 
+type LoginLocationState = {
+  message?: string
+}
+
 export function LoginPage() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
@@ -25,7 +29,7 @@ export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const successMessage = (location.state as any)?.message
+  const successMessage = (location.state as LoginLocationState | null)?.message
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,8 +45,12 @@ export function LoginPage() {
       const res = await authApi.login(username.trim(), password)
       await login(res.access_token)
       navigate("/experiments", { replace: true })
-    } catch (err: any) {
-      setError(err.message || "Failed to sign in. Please verify your credentials.")
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to sign in. Please verify your credentials."
+      )
     } finally {
       setLoading(false)
     }

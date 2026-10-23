@@ -1,8 +1,8 @@
 export class ApiError extends Error {
   status: number
-  detail: any
+  detail: unknown
 
-  constructor(status: number, message: string, detail?: any) {
+  constructor(status: number, message: string, detail?: unknown) {
     super(message)
     this.name = "ApiError"
     this.status = status
@@ -12,30 +12,47 @@ export class ApiError extends Error {
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? ""
 
-export function formatErrorMessage(status: number, data: any): string {
-  if (!data) {
+export function formatErrorMessage(status: number, data: unknown): string {
+  if (!data || typeof data !== "object") {
     return `Request failed with status ${status}`
   }
 
-  if (typeof data.detail === "string") {
-    return data.detail
+  const responseData = data as {
+    detail?: unknown
+    Message?: unknown
+    message?: unknown
   }
 
-  if (Array.isArray(data.detail)) {
-    return data.detail
-      .map((item: any) => {
-        const field = item.loc ? item.loc[item.loc.length - 1] : "field"
-        return `${field}: ${item.msg}`
+  if (typeof responseData.detail === "string") {
+    return responseData.detail
+  }
+
+  if (Array.isArray(responseData.detail)) {
+    return responseData.detail
+      .map((item) => {
+        if (!item || typeof item !== "object") {
+          return "field: Invalid value"
+        }
+
+        const validationError = item as {
+          loc?: unknown[]
+          msg?: unknown
+        }
+        const field =
+          validationError.loc && validationError.loc.length > 0
+            ? String(validationError.loc[validationError.loc.length - 1])
+            : "field"
+        return `${field}: ${String(validationError.msg ?? "Invalid value")}`
       })
       .join(", ")
   }
 
-  if (typeof data.Message === "string") {
-    return data.Message
+  if (typeof responseData.Message === "string") {
+    return responseData.Message
   }
 
-  if (typeof data.message === "string") {
-    return data.message
+  if (typeof responseData.message === "string") {
+    return responseData.message
   }
 
   return `Request failed with status ${status}`
@@ -76,26 +93,24 @@ export async function apiClient<T>(
   }
 
   const contentType = response.headers.get("content-type")
-  let data: any = null
-  if (contentType && contentType.includes("application/json")) {
+  let data: unknown = null
+  if (contentType?.includes("application/json")) {
     try {
       data = await response.json()
     } catch {
       data = null
     }
-  } else if (contentType && contentType.includes("text/html")) {
+  } else if (contentType?.includes("text/html")) {
     throw new ApiError(
       response.status,
-      "Received HTML response from server instead of JSON. Ensure backend is running and the endpoint is properly configured.",
-      null
+      "Received HTML response from server instead of JSON. Ensure backend is running and the endpoint is properly configured."
     )
   } else {
     data = await response.text()
   }
 
   if (!response.ok) {
-    const message = formatErrorMessage(response.status, data)
-    throw new ApiError(response.status, message, data)
+    throw new ApiError(response.status, formatErrorMessage(response.status, data), data)
   }
 
   return data as T
